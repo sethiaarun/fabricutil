@@ -46,6 +46,7 @@ def wait_for_session_ready(livy_url, session_id, timeout=300):
     url = f"{livy_url}/{session_id}"
 
     print("⏳ Waiting for session to become idle...")
+    time.sleep(5)
     start = time.time()
     while True:
         resp = requests.get(url, headers=headers)

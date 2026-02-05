@@ -1,0 +1,201 @@
+# Test Results Analyzer
+
+A set of Python tools to analyze JUnit XML test results from Azure DevOps pipelines and generate comprehensive CSV and HTML reports.
+
+## Tools
+
+| Script | Description |
+|--------|-------------|
+| `test_results_analyzer.py` | Analyzes JUnit XML test result zip files and generates failure/error reports |
+| `test_results_compare.py` | Compares test results between two runs to identify regressions and fixes |
+
+## Features
+
+### Test Results Analyzer (`test_results_analyzer.py`)
+
+- Processes JUnit XML test result zip files from Azure DevOps pipelines
+- Detects **failures**, **errors**, and **aborted** tests
+- Auto-detects module names from Java/Scala package structure
+- Generates source file paths from class names
+- Outputs both CSV (spreadsheet-compatible) and HTML (interactive) reports
+- HTML report includes:
+  - Summary statistics
+  - Breakdown by zip file and module
+  - Interactive filtering
+  - Dark theme UI
+
+### Test Results Comparator (`test_results_compare.py`)
+
+- Compares test failures between two runs (e.g., PR success vs current build)
+- Identifies:
+  - **New Failures (Regressions)** - Tests failing in current but not in baseline
+  - **Common (Known Issues)** - Tests failing in both runs
+  - **Fixed** - Tests that were failing but are now passing
+- Generates comparison reports in CSV and HTML formats
+- HTML report highlights regressions requiring immediate attention
+
+## Prerequisites
+
+- Python 3.6+
+- No external dependencies (uses only Python standard library)
+
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/sethiaarun/fabricutil.git
+cd fabricutil/test-results-analyzer
+
+# Make scripts executable (optional)
+chmod +x test_results_analyzer.py test_results_compare.py
+```
+
+## Usage
+
+### Analyzing Test Results
+
+```bash
+# Analyze a single zip file
+python3 test_results_analyzer.py TestResults_123456.zip
+
+# Analyze multiple zip files
+python3 test_results_analyzer.py *.zip -o ./reports
+
+# Specify custom output filenames
+python3 test_results_analyzer.py *.zip --csv-name results.csv --html-name results.html -o ./output
+```
+
+**Arguments:**
+| Argument | Description |
+|----------|-------------|
+| `zip_files` | One or more zip files containing JUnit XML results |
+| `-o, --output-dir` | Output directory for reports (default: current directory) |
+| `--csv-name` | CSV output filename (default: `test_failures.csv`) |
+| `--html-name` | HTML output filename (default: `test_failures.html`) |
+
+### Comparing Test Results
+
+```bash
+# Compare using directories (auto-finds test_failures.csv in reports/ subdirectory)
+python3 test_results_compare.py \
+  --baseline-dir /path/to/preprsuccess \
+  --current-dir /path/to/current \
+  -o ./comparison
+
+# Compare using CSV files directly
+python3 test_results_compare.py baseline.csv current.csv -o ./comparison
+
+# With custom display names
+python3 test_results_compare.py \
+  --baseline-dir ./preprsuccess \
+  --current-dir ./current \
+  --baseline-name "PR Success (Merged)" \
+  --current-name "Current Build" \
+  -o ./comparison
+```
+
+**Arguments:**
+| Argument | Description |
+|----------|-------------|
+| `baseline_csv` | Baseline CSV file (PR success) |
+| `current_csv` | Current CSV file |
+| `--baseline-dir` | Directory containing baseline results |
+| `--current-dir` | Directory containing current results |
+| `-o, --output-dir` | Output directory for comparison reports |
+| `--baseline-name` | Display name for baseline in reports |
+| `--current-name` | Display name for current in reports |
+
+## Example Workflow
+
+```bash
+# Step 1: Download test result zips from Azure DevOps
+# Place PR success results in ./preprsuccess/
+# Place current build results in ./current/
+
+# Step 2: Analyze both sets
+python3 test_results_analyzer.py ./preprsuccess/*.zip -o ./preprsuccess/reports
+python3 test_results_analyzer.py ./current/*.zip -o ./current/reports
+
+# Step 3: Compare results
+python3 test_results_compare.py \
+  --baseline-dir ./preprsuccess \
+  --current-dir ./current \
+  --baseline-name "PR Success" \
+  --current-name "Current Build" \
+  -o ./comparison
+
+# Step 4: Open HTML reports in browser
+open ./current/reports/test_failures.html
+open ./comparison/comparison.html
+```
+
+## Output Files
+
+### Analyzer Output
+
+| File | Description |
+|------|-------------|
+| `test_failures.csv` | CSV with columns: Test Name, Class Name, Source File, Module, Status, Message, Duration, Zip File |
+| `test_failures.html` | Interactive HTML report with filtering and summary |
+
+### Comparator Output
+
+| File | Description |
+|------|-------------|
+| `comparison.csv` | CSV with Category (NEW FAILURE/COMMON/FIXED), Test Name, Class Name, Source File, Module, Status, Message |
+| `comparison.html` | Interactive HTML comparison report highlighting regressions |
+
+## CSV Schema
+
+### test_failures.csv
+
+```csv
+Test Name,Class Name,Source File,Module,Status,Message,Duration (s),Zip File
+testBloomFilter,org.apache.spark.sql.JavaDataFrameSuite,org/apache/spark/sql/JavaDataFrameSuite.scala,sql/core,failure,"assertion failed",0.150,TestResults_123.zip
+```
+
+### comparison.csv
+
+```csv
+Category,Test Name,Class Name,Source File,Module,Status,Message
+NEW FAILURE,testBloomFilter,org.apache.spark.sql.JavaDataFrameSuite,...,sql/core,failure,"assertion failed"
+COMMON (Known),testFoo,org.apache.spark.sql.FooSuite,...,sql/core,failure,"known issue"
+FIXED,testBar,org.apache.spark.sql.BarSuite,...,sql/core,failure,"was failing"
+```
+
+## Module Detection
+
+The tool automatically detects modules from Java/Scala package names:
+
+| Package Pattern | Detected Module |
+|-----------------|-----------------|
+| `org.apache.spark.sql.*` | sql/core |
+| `org.apache.spark.sql.catalyst.*` | sql/catalyst |
+| `org.apache.spark.sql.hive.*` | sql/hive |
+| `org.apache.spark.ml.*` | mllib |
+| `org.apache.spark.mllib.*` | mllib |
+| `org.apache.spark.streaming.*` | streaming |
+| `org.apache.spark.sql.avro.*` | connector/avro |
+| `org.apache.spark.sql.kafka.*` | connector/kafka |
+| `org.apache.spark.sql.connect.*` | connector/connect |
+| `*.onesecurity.*` | onesecurity |
+
+## Screenshots
+
+### Test Failures Report
+![Test Failures HTML](docs/test_failures_report.png)
+
+### Comparison Report
+![Comparison HTML](docs/comparison_report.png)
+
+## License
+
+MIT License - See [LICENSE](../LICENSE) for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
+
+## Author
+
+Created for analyzing Spark test results from Azure DevOps pipelines.

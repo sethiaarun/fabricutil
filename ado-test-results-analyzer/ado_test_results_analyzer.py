@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-ADO Test Results Analyzer
-=========================
-Analyzes JUnit XML test result zip files from Azure DevOps (ADO) pipelines
-and generates CSV and HTML reports for failed, errored, and aborted test cases.
+Test Results Analyzer
+=====================
+Analyzes JUnit XML test result zip files and generates CSV and HTML reports
+for failed, errored, and aborted test cases.
 
 Usage:
-    python ado_test_results_analyzer.py <zip_file1> [zip_file2] ... [-o output_dir]
-    python ado_test_results_analyzer.py /path/to/*.zip -o /path/to/output
+    python test_results_analyzer.py <zip_file1> [zip_file2] ... [-o output_dir]
+    python test_results_analyzer.py /path/to/*.zip -o /path/to/output
 
 Examples:
-    python ado_test_results_analyzer.py TestResults_756313378.zip
-    python ado_test_results_analyzer.py *.zip -o ./reports
-    python ado_test_results_analyzer.py test1.zip test2.zip --output-dir ./results
+    python test_results_analyzer.py TestResults_756313378.zip
+    python test_results_analyzer.py *.zip -o ./reports
+    python test_results_analyzer.py test1.zip test2.zip --output-dir ./results
 """
 
 import argparse
@@ -51,26 +51,8 @@ def extract_module_from_classname(classname: str) -> str:
     
     # Look for common module indicators
     module_indicators = {
-        'sql': 'sql/core',
-        'catalyst': 'sql/catalyst',
-        'hive': 'sql/hive',
-        'streaming': 'streaming',
-        'mllib': 'mllib',
-        'ml': 'mllib',
-        'graphx': 'graphx',
-        'core': 'core',
-        'yarn': 'resource-managers/yarn',
-        'kubernetes': 'resource-managers/kubernetes',
-        'mesos': 'resource-managers/mesos',
-        'avro': 'connector/avro',
-        'kafka': 'connector/kafka',
-        'connect': 'connector/connect',
-        'protobuf': 'connector/protobuf',
-        'pipelines': 'sql/pipelines',
-        'scripting': 'sql/core',
-        'artifact': 'sql/core',
-        'execution': 'sql/core',
-        'onesecurity': 'onesecurity',
+        'mlib': 'core/mlib',
+        'sql': 'common/sql'
     }
     
     for part in parts:
@@ -622,7 +604,7 @@ def generate_html(failures: List[TestFailure], output_path: str, zip_files: List
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Analyze JUnit XML test results from Azure DevOps (ADO) pipeline zip files and generate reports.',
+        description='Analyze JUnit XML test results from zip files and generate reports.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:

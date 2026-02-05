@@ -185,10 +185,10 @@ The tool automatically detects modules from Java/Scala package names:
 ## Screenshots
 
 ### Test Failures Report
-![Test Failures HTML](../images/ado_test_result_analyzer/test_failures_report.png)
+![Test Failures HTML](images/test_failures_report.png)
 
 ### Comparison Report
-![Comparison HTML](../images/ado_test_result_analyzer/comparison_report.png)
+![Comparison HTML](images/comparison_report.png)
 
 ## License
 

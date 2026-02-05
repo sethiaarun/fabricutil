@@ -200,4 +200,4 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## Author
 
-Created for analyzing Apache Spark test results from Azure DevOps (ADO) pipelines.
+Created for analyzing test results from Azure DevOps (ADO) pipelines.

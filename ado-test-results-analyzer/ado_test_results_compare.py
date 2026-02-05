@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-Test Results Comparator
-=======================
-Compares test failures between two runs (e.g., PR success vs Current) and generates
-reports showing common failures, new failures, and fixed tests.
+ADO Test Results Comparator
+===========================
+Compares test failures between two Azure DevOps (ADO) pipeline runs
+(e.g., PR success vs Current) and generates reports showing common failures,
+new failures, and fixed tests.
 
 Usage:
-    python test_results_compare.py <baseline_csv> <current_csv> [-o output_dir]
-    python test_results_compare.py --baseline-dir <dir1> --current-dir <dir2> [-o output_dir]
+    python ado_test_results_compare.py <baseline_csv> <current_csv> [-o output_dir]
+    python ado_test_results_compare.py --baseline-dir <dir1> --current-dir <dir2> [-o output_dir]
 
 Examples:
-    python test_results_compare.py preprsuccess/reports/test_failures.csv current/reports/test_failures.csv
-    python test_results_compare.py --baseline-dir preprsuccess --current-dir current -o comparison_reports
+    python ado_test_results_compare.py preprsuccess/reports/test_failures.csv current/reports/test_failures.csv
+    python ado_test_results_compare.py --baseline-dir preprsuccess --current-dir current -o comparison_reports
 """
 
 import argparse
